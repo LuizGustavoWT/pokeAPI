@@ -1,0 +1,37 @@
+{
+  "name": "pokeAPI",
+  "version": "1.0.0",
+  "description": "API pokemon desenvolvida para a matéria tópicos avançados",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsnd --transpile-only --ignore-watch node_modules --respawn src/main.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuizGustavoWT/pokeAPI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LuizGustavoWT/pokeAPI/issues"
+  },
+  "homepage": "https://github.com/LuizGustavoWT/pokeAPI#readme",
+  "dependencies": {
+    "@types/express": "^4.17.8",
+    "@types/mysql": "^2.15.15",
+    "@types/node": "^14.10.1",
+    "@types/reflect-metadata": "^0.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mysql": "^2.18.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.26",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.0.0-pre.62"
+  }
+}
