@@ -30,10 +30,10 @@ export async function getAllPokemonsName(req: Request, res: Response) {
 export async function getAllPokemonsSpecie(req: Request, res: Response) {
   const { especie } = req.params;
 
-  const pokemons = getManager()
+  const pokemons = await getManager()
     .createQueryBuilder(Pokemon, "pokemon")
     .where("pokemon.especie like :especie", {
-      especie: especie
+      especie: `%${especie}%`
     })
     .getMany();
 
@@ -41,8 +41,52 @@ export async function getAllPokemonsSpecie(req: Request, res: Response) {
 
 }
 
-export async function getPokemons(req: Request, res: Response) {
+export async function getAllPokemonsType(req: Request, res: Response) {
+
+  const { tipo } = req.params;
+
   const pokemons = getManager()
+    .createQueryBuilder(Pokemon, "pokemon")
+    .where("pokemon.tipo like :tipo", {
+      tipo: tipo
+    })
+    .getMany();
+
+  res.json(pokemons).send(200);
+
+}
+
+export async function getPokemon(req: Request, res: Response) {
+
+  const { id } = req.params;
+
+  const total = await getManager()
+    .createQueryBuilder(Pokemon, 'pokemon').getCount();
+
+  const pokemon = await getManager()
+    .createQueryBuilder(Pokemon, 'pokemon').where('pokemon.id = :id', {
+      id: id
+    })
+    .getOne()
+
+  var retPoke: any = pokemon
+
+  retPoke.total = total
+
+  retPoke.links = {
+    self: {
+      href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons`
+    },
+    nextItem: {
+      href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons/${(parseInt(id) < total) ? (parseInt(id) + 1) : 1}`
+    }
+  }
+
+  res.json(retPoke).send(200)
+}
+
+export async function getPokemons(req: Request, res: Response) {
+  const pokemons = await getManager()
     .createQueryBuilder(Pokemon, "pokemon").getMany();
 
   res.json(pokemons).send(200)

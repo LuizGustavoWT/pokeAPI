@@ -74,4 +74,6 @@ export class Pokemon implements TypeOrmEntity{
     type: "text"
   })
   descricao;
+
+
 }
