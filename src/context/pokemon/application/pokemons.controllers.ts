@@ -1,5 +1,6 @@
-import { Request, Response } from 'express';
+import { json, Request, Response } from 'express';
 import { getConnection, getManager } from 'typeorm'
+import { isNull } from 'util';
 import { Pokemon } from '../domain/pokemon.entity';
 
 
@@ -59,15 +60,46 @@ export async function getAllPokemonsType(req: Request, res: Response) {
 export async function getPokemon(req: Request, res: Response) {
 
   const { id } = req.params;
-
-  const total = await getManager()
-    .createQueryBuilder(Pokemon, 'pokemon').getCount();
+  var netxtPoke: Pokemon;
+  var beforePoke: Pokemon;
 
   const pokemon = await getManager()
     .createQueryBuilder(Pokemon, 'pokemon').where('pokemon.id = :id', {
       id: id
     })
-    .getOne()
+    .getOne();
+
+  if(!pokemon){
+    res.send(404);
+  }
+
+  const total = await getManager()
+    .createQueryBuilder(Pokemon, 'pokemon').getCount();
+
+  var idNext: number = (parseInt(id) < total) ? (parseInt(id) + 1) : 1;
+
+
+
+  var idBefore: number = (pokemon.id == 1) ? total : (pokemon.id - 1);
+
+  do {
+    netxtPoke = await getManager()
+      .createQueryBuilder(Pokemon, 'pokemon').where('pokemon.id = :id', {
+        id: idNext++
+      })
+      .getOne();
+
+  } while (netxtPoke == undefined)
+
+  do {
+
+    beforePoke = await getManager()
+      .createQueryBuilder(Pokemon, 'pokemon').where('pokemon.id = :id', {
+        id: idBefore--
+      })
+      .getOne();
+
+  } while (beforePoke == undefined)
 
   var retPoke: any = pokemon
 
@@ -78,7 +110,13 @@ export async function getPokemon(req: Request, res: Response) {
       href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons`
     },
     nextItem: {
-      href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons/${(parseInt(id) < total) ? (parseInt(id) + 1) : 1}`
+      href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons/${netxtPoke.id}`
+    },
+    beforeItem: {
+      href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons/${beforePoke.id}`
+    },
+    delete: {
+      href: `http://${process.env.VIRTUAL_HOST}:${process.env.LISTEN_PORT}/pokemons/${id}`
     }
   }
 
@@ -90,6 +128,24 @@ export async function getPokemons(req: Request, res: Response) {
     .createQueryBuilder(Pokemon, "pokemon").getMany();
 
   res.json(pokemons).send(200)
+}
+
+export async function deletePokemon(req: Request, res: Response) {
+  const { id } = req.params;
+
+  await getConnection()
+    .createQueryBuilder()
+    .delete()
+    .from(Pokemon)
+    .where('id = :id', {
+      id: parseInt(id)
+    })
+    .execute();
+
+  res.json({
+    masg: "Pokemon Deletado Com Sucesso"
+  }).send(201)
+
 }
 
 export async function setPokemons(req: Request, res: Response) {

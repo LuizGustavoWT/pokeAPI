@@ -6,7 +6,7 @@ import {
   getAllPokemonsName,
   getAllPokemonsSpecie,
   getPokemons, 
-  getAllPokemonsType, getPokemon
+  getAllPokemonsType, getPokemon, deletePokemon
 } from './application/pokemons.controllers';
 
 const router = Router();
@@ -18,6 +18,8 @@ router.post('/', setPokemons)
 router.get('/', getPokemons)
 
 router.get('/:id', getPokemon);
+
+router.delete('/:id', deletePokemon);
 
 router.get('/names/:name', getAllPokemonsName)
 
